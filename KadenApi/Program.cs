@@ -8,6 +8,11 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddHttpClient<OmnerClient>(client =>
+{
+    client.BaseAddress = new Uri("https+http://omnerapi/");
+});
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -24,4 +29,21 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/Call", async (string message, OmnerClient omner) =>
+{
+    message = await omner.MakeCall(message);
+    return message;
+});
+
 app.Run();
+
+public class OmnerClient(HttpClient client)
+{
+    public async Task<string> MakeCall(string message)
+    {
+        var modifiedMessage = $"{message} is a really cool thing to say there Jonathan!";
+        var response = await client.GetAsync($"/call?message={modifiedMessage}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
+    }
+}
