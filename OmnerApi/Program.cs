@@ -3,6 +3,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
+builder.Services.AddHttpClient("aidanapi", client =>
+{
+    client.BaseAddress = new Uri("http+https://aidanapi");
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -24,4 +28,22 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/call", (string message, AidanClient aidan) =>
+{
+    var myString = $"Red Herring: {message.Count() - Random.Shared.Next()%258}";
+    var response = aidan.MakeCall(myString);
+    
+    return response;
+});
+
 app.Run();
+
+public class AidanClient(HttpClient client)
+{
+    public async Task<string> MakeCall(string message)
+    {
+        var response = await client.GetAsync("/call?message=" + message);
+        // Simulate an API call to Aidan
+        return await response.Content.ReadAsStringAsync();
+    }
+}
