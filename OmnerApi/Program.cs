@@ -31,11 +31,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/call", ([FromQuery]string message, AidanClient aidan) =>
+app.MapGet("/call", ([FromQuery] string message, AidanClient aidan, ILogger<Program> logger) =>
 {
-    var myString = $"Red Herring: {message.Count() - Random.Shared.Next()%258} {message}";
+    var myString = $"Red Herring: {message.Count() - Random.Shared.Next() % 258} {message}";
+    logger.LogInformation("Got {message} sent {modified}", message, myString);
     var response = aidan.MakeCall(myString);
-    
+
     return response;
 });
 

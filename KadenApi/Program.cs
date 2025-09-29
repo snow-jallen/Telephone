@@ -37,11 +37,12 @@ app.MapGet("/Call", async (string message, OmnerClient omner) =>
 
 app.Run();
 
-public class OmnerClient(HttpClient client)
+public class OmnerClient(HttpClient client, ILogger<OmnerClient> logger)
 {
     public async Task<string> MakeCall(string message)
     {
         var modifiedMessage = $"{message} is a really cool thing to say there Jonathan!";
+        logger.LogInformation("Got {message} sent {modified}", message, modifiedMessage);
         var response = await client.GetAsync($"/call?message={modifiedMessage}");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
