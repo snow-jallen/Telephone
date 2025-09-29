@@ -36,19 +36,23 @@ app.MapControllers();
 
 bool retry = true;
 
-app.MapGet("/Call", async (string message, IHttpClientFactory factory) => {
+app.MapGet("/Call", async (string message, IHttpClientFactory factory, ILogger<Program> logger) => {
 
     var client = factory.CreateClient("kadenapi");
 
     if (retry)
     {
-        var response = await client.GetAsync($"/Call?message={message}");
         retry = false;
+        logger.LogInformation("Got {original} and sent {modified}", message, message);
+        var response = await client.GetAsync($"/Call?message={message}");
         return await response.Content.ReadAsStringAsync();
     }
     else
     {
-        return message + ", ends in aidanAPI";
+        var modified = message + ", ends in aidanAPI";
+        logger.LogInformation("Got {original} and sent {modified}", message, modified);
+        return modified;
+
     }
 });
 

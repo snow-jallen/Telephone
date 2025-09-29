@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 // Add services to the container.
-builder.Services.AddHttpClient("aidanapi", client =>
+builder.Services.AddHttpClient<AidanClient>(client =>
 {
     client.BaseAddress = new Uri("http+https://aidanapi");
 });
@@ -28,7 +31,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/call", (string message, AidanClient aidan) =>
+app.MapGet("/call", ([FromQuery]string message, AidanClient aidan) =>
 {
     var myString = $"Red Herring: {message.Count() - Random.Shared.Next()%258}";
     var response = aidan.MakeCall(myString);
