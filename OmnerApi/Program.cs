@@ -33,7 +33,7 @@ app.MapControllers();
 
 app.MapGet("/call", ([FromQuery]string message, AidanClient aidan) =>
 {
-    var myString = $"Red Herring: {message.Count() - Random.Shared.Next()%258}";
+    var myString = $"Red Herring: {message.Count() - Random.Shared.Next()%258} {message}";
     var response = aidan.MakeCall(myString);
     
     return response;
